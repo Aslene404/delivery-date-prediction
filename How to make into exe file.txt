@@ -1,0 +1,1 @@
+pyinstaller --onefile demo_3.py
