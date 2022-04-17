@@ -1,18 +1,15 @@
-import sys
 import random
 import pandas as pd
 
 from datetime import datetime
 from datetime import timedelta
 
-import numpy as np
 
-import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-
+print("ALt+Left Arrow to rollback in the navigator")
 df = pd.read_excel('C:/Users/USER/NoteBooks/Dropex-Wardenine-Final_fake.xlsx')
 df['delta_days'] = (df['Date arrivée'] - df['Date']).dt.total_seconds() / (60 * 60 * 24)
 
@@ -127,77 +124,96 @@ import wx
 
 class windowClass(wx.Frame):
     def __init__(self,*args,**kwargs):
-        super(windowClass,self).__init__(*args,**kwargs,size=(800,600))
+        super(windowClass,self).__init__(*args,**kwargs,size=(1280,720))
+
         self.basicGUI()
     def basicGUI(self):
         panel=wx.Panel(self)
 
         menuBar=wx.MenuBar()
         fileButton=wx.Menu()
+        manItem = wx.MenuItem(fileButton, wx.NewId(), 'Manager Space')
+        fileButton.Append(manItem)
         exitItem=wx.MenuItem(fileButton,wx.ID_EXIT,'Exit')
         exitItem.SetBitmap(wx.Bitmap('C:/Users/USER/NoteBooks/1.png'))
         fileButton.Append(exitItem)
 
+
         menuBar.Append(fileButton,'File')
         self.SetMenuBar(menuBar)
         self.Bind(wx.EVT_MENU,self.Quit,exitItem)
-        yesNoBox=wx.MessageDialog(None,'We can help you predict when your order will come','Welcome',wx.YES_DEFAULT)
-        yesNoAnswer = yesNoBox.ShowModal()
-        yesNoBox.Destroy()
-        chooseOneBox = wx.SingleChoiceDialog(None,'Choose your Governorate','Governorate choice',["Ariana" ,"Beja","Ben Arous","Bizerte" ,"Gabes" ,"Gafsa" ,"Jendouba","Kairouan" ,"Tunis" ,"Zaghouan" ,"Kasserine" ,"Kébili" ,"Le Kef" ,"Mahdia","La Manouba","Médenine","Monastir","Nabeul","Sfax","Sidi Bouzid","Siliana" ,"Sousse" ,"Tataouine","Tozeur"])
-        if chooseOneBox.ShowModal()==wx.ID_OK:
-            val=chooseOneBox.GetStringSelection()
-        nameBox=wx.TextEntryDialog(None,"Enter your order's price","Order's price")
-        if nameBox.ShowModal()==wx.ID_OK:
-            val_cod=nameBox.GetValue()
-        options = {"Ariana": 0,
-                              "Beja" :1 ,
-                              "Ben Arous" :2 ,
-                              "Bizerte" :3 ,
-                              "Gabes" :4 ,
-                              "Gafsa" :5 ,
-                              "Jendouba" :6 ,
-                              "Kairouan" :7 ,
-                              "Tunis" :22 ,
-                              "Zaghouan" :23 ,
-                              "Kasserine" :8 ,
-                              "Kébili" :9 ,
-                              "Le Kef" :11 ,
-                              "Mahdia" :12,
-                              "La Manouba" :10 ,
-                              "Médenine" :14 ,
-                              "Monastir" :13 ,
-                              "Nabeul" :15 ,
-                              "Sfax" :16 ,
-                             "Sidi Bouzid" :17,
-                              "Siliana" :18 ,
-                              "Sousse" :19 ,
-                              "Tataouine" :20 ,
-                              "Tozeur" :21 }
+        self.Bind(wx.EVT_MENU, self.Man, manItem)
 
-        gov=options[val]
-        test=RFC.predict([ [val_cod,gov] ])
-        print(int(test[0]))
+        box=wx.PasswordEntryDialog(None,"Enter Manager Password","Authentication","")
+        if box.ShowModal()==wx.ID_OK and box.GetValue()=="root":
+            self.Close()
+            import eel
+            eel.init('C:/Users/USER/NoteBooks/template')
+            eel.start("template/chart-chartjs.html",block=False)
+            while True:
+                eel.sleep(10)
+        else :
+            yesNoBox=wx.MessageDialog(None,'We can help you predict when your order will come','Welcome',wx.YES_DEFAULT)
+            yesNoAnswer = yesNoBox.ShowModal()
+            yesNoBox.Destroy()
+            chooseOneBox = wx.SingleChoiceDialog(None,'Choose your Governorate','Governorate choice',["Ariana" ,"Beja","Ben Arous","Bizerte" ,"Gabes" ,"Gafsa" ,"Jendouba","Kairouan" ,"Tunis" ,"Zaghouan" ,"Kasserine" ,"Kébili" ,"Le Kef" ,"Mahdia","La Manouba","Médenine","Monastir","Nabeul","Sfax","Sidi Bouzid","Siliana" ,"Sousse" ,"Tataouine","Tozeur"])
+            if chooseOneBox.ShowModal()==wx.ID_OK:
+                val=chooseOneBox.GetStringSelection()
+            nameBox=wx.TextEntryDialog(None,"Enter your order's price","Order's price")
+            if nameBox.ShowModal()==wx.ID_OK:
+                val_cod=nameBox.GetValue()
+            options = {"Ariana": 0,
+                                  "Beja" :1 ,
+                                  "Ben Arous" :2 ,
+                                  "Bizerte" :3 ,
+                                  "Gabes" :4 ,
+                                  "Gafsa" :5 ,
+                                  "Jendouba" :6 ,
+                                  "Kairouan" :7 ,
+                                  "Tunis" :22 ,
+                                  "Zaghouan" :23 ,
+                                  "Kasserine" :8 ,
+                                  "Kébili" :9 ,
+                                  "Le Kef" :11 ,
+                                  "Mahdia" :12,
+                                  "La Manouba" :10 ,
+                                  "Médenine" :14 ,
+                                  "Monastir" :13 ,
+                                  "Nabeul" :15 ,
+                                  "Sfax" :16 ,
+                                 "Sidi Bouzid" :17,
+                                  "Siliana" :18 ,
+                                  "Sousse" :19 ,
+                                  "Tataouine" :20 ,
+                                  "Tozeur" :21 }
 
-        value = random.uniform(0,4)
-        print(value)
-        res=datetime.now() + timedelta(days=int(test[0])+1,hours=value)
-        print (res)
-        acc_str=str(acc_rfc*100)+"%"
-        final_res="Your order will be delivered on \n"+str(res)+"\nAccuracy:"+" "+acc_str
+            gov=options[val]
+            test=RFC.predict([ [val_cod,gov] ])
+            print(int(test[0]))
+
+            value = random.uniform(0,4)
+            print(value)
+            res=datetime.now() + timedelta(days=int(test[0])+1,hours=value)
+            print (res)
+            acc_str=str(acc_rfc*100)+"%"
+            final_res="Your order will be delivered on \n"+str(res)+"\nAccuracy:"+" "+acc_str
 
 
-        aweText=wx.StaticText(panel,-1,final_res,(3,3))
-        aweText.SetForegroundColour('#67cddc')
-        aweText.SetBackgroundColour('black')
-        font = wx.Font(18, wx.DECORATIVE, wx.ITALIC, wx.BOLD)
-        aweText.SetFont(font)
-        png = wx.Image("C:/Users/USER/NoteBooks/2.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        wx.StaticBitmap(panel, -1, png, (200, 100), (png.GetWidth(), png.GetHeight()))
-        self.SetTitle('Predicting Delivery Date & Time')
-        self.Show(True)
+            aweText=wx.StaticText(panel,-1,final_res,(3,3))
+            aweText.SetForegroundColour('#67cddc')
+            aweText.SetBackgroundColour('black')
+            font = wx.Font(18, wx.DECORATIVE, wx.ITALIC, wx.BOLD)
+            aweText.SetFont(font)
+            png = wx.Image("C:/Users/USER/NoteBooks/2.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+            wx.StaticBitmap(panel, -1, png, (200, 100), (png.GetWidth(), png.GetHeight()))
+            self.SetTitle('Predicting Delivery Date & Time')
+            self.Show(True)
     def Quit(self,e):
         self.Close()
+
+    def Man(self, e):
+        def __init__(self, *args, **kwargs):
+            super(windowClass, self).__init__(*args, **kwargs, size=(1280, 720))
 def main():
     app=wx.App()
     windowClass(None)
